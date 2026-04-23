@@ -152,4 +152,17 @@ builder.defineStreamHandler(async ({ type, id }) => {
   }
 });
 
-serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000, hostname: '0.0.0.0' });
+const express = require('express');
+const app = express();
+const addonInterface = builder.getInterface();
+
+app.get('/manifest.json', (req, res) => res.json(addonInterface.manifest));
+app.get('/:resource/:type/:id.json', (req, res) => {
+  const { resource, type, id } = req.params;
+  addonInterface.get({ resource, type, id })
+    .then(resp => res.json(resp))
+    .catch(err => res.status(500).json({ error: err.message }));
+});
+
+const PORT = process.env.PORT || 7000;
+app.listen(PORT, '0.0.0.0', () => console.log(`Addon running on port ${PORT}`));
