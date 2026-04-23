@@ -154,6 +154,11 @@ builder.defineStreamHandler(async ({ type, id }) => {
 
 const express = require('express');
 const app = express();
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  next();
+});
 const addonInterface = builder.getInterface();
 
 app.get('/manifest.json', (req, res) => res.json(addonInterface.manifest));
